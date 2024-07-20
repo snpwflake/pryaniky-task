@@ -3,13 +3,11 @@ import { styled, alpha } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import Menu, { MenuProps } from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import EditIcon from "@mui/icons-material/Edit";
 
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { UserDocs } from "../../models/userDocs";
-import DeleteUserDocButton from "./DialogDeleteUser";
-import { UserDocsContext } from "../Logic/UserDocsLogic";
-import { useContext } from "react";
+import DeleteUserDocButton from "./DialogDeleteDoc";
+import ChangeDocButton from "./DialogChangeDoc";
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
@@ -54,24 +52,14 @@ const StyledMenu = styled((props: MenuProps) => (
   },
 }));
 
-export default function CustomizedMenus({ data }: { data?: UserDocs }) {
+export default function ChangeButton({ data }: { data?: UserDocs }) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const userDocs = useContext(UserDocsContext);
-  console.log(userDocs);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
-  };
-
-  const handleEdit = () => {
-    handleClose();
-  };
-
-  const handleDelete = () => {
-    handleClose();
   };
 
   return (
@@ -98,10 +86,7 @@ export default function CustomizedMenus({ data }: { data?: UserDocs }) {
         open={open}
         onClose={handleClose}
       >
-        <MenuItem onClick={handleEdit} disableRipple>
-          <EditIcon />
-          Редактировать
-        </MenuItem>
+        <ChangeDocButton data={data} />
         <DeleteUserDocButton data={data} />
       </StyledMenu>
     </div>

@@ -5,7 +5,6 @@ import Layout from "../components/Layout/Layout";
 
 const MainPage = () => {
   const { token, status } = useAuthToken();
-  const sessionLoading = status === "loading";
 
   useEffect(() => {
     if (status === "authorized") {
@@ -16,7 +15,10 @@ const MainPage = () => {
   }, [token, status]);
   return (
     <>
-      <Layout>1</Layout>
+      <Layout>
+        <LoadingSession loading={status === "loading"} />
+        <h1>Главная</h1>
+      </Layout>
     </>
   );
 };

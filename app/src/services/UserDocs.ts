@@ -2,8 +2,8 @@ import $api from "../https";
 import { AxiosResponse } from "axios";
 import { UserDocs } from "../models/userDocs";
 
-export interface UserDocsResponse {
-  data: UserDocs[];
+export interface UserDocsResponse<T> {
+  data: T;
   error_code: number;
   error_message: string;
   profiling: string;
@@ -11,31 +11,37 @@ export interface UserDocsResponse {
 }
 
 export default class fetchUserDocs {
-  static async getUsers(): Promise<AxiosResponse<UserDocsResponse>> {
-    return $api.get<UserDocsResponse>(
+  static async getUsers(): Promise<
+    AxiosResponse<UserDocsResponse<UserDocs[]>>
+  > {
+    return $api.get<UserDocsResponse<UserDocs[]>>(
       "/ru/data/v3/testmethods/docs/userdocs/get"
     );
   }
 
-  static async addUsers(params: UserDocs): Promise<AxiosResponse<UserDocs>> {
-    return $api.post<UserDocs>(
+  static async addDoc(
+    params: UserDocs
+  ): Promise<AxiosResponse<UserDocsResponse<UserDocs>>> {
+    return $api.post<UserDocsResponse<UserDocs>>(
       "/ru/data/v3/testmethods/docs/userdocs/create",
       params
     );
   }
 
-  static async updateUsers(
+  static async updateDoc(
     params: UserDocs,
     id: string
-  ): Promise<AxiosResponse<UserDocs>> {
-    return $api.post<UserDocs>(
+  ): Promise<AxiosResponse<UserDocsResponse<UserDocs>>> {
+    return $api.post<UserDocsResponse<UserDocs>>(
       `/ru/data/v3/testmethods/docs/userdocs/set/${id}`,
       params
     );
   }
 
-  static async deleteUsers(id: string): Promise<AxiosResponse<UserDocs>> {
-    return $api.delete<UserDocs>(
+  static async deleteDoc(
+    id: string
+  ): Promise<AxiosResponse<UserDocsResponse<UserDocs>>> {
+    return $api.delete<UserDocsResponse<UserDocs>>(
       `/ru/data/v3/testmethods/docs/userdocs/delete/${id}`
     );
   }

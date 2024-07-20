@@ -1,4 +1,3 @@
-// @ts-ignore
 import * as React from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -6,15 +5,16 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import MenuItem from "@mui/material/MenuItem";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { UserDocs } from "../../models/userDocs";
+import MenuItem from "@mui/material/MenuItem";
 import fetchUserDocs from "../../services/UserDocs";
 import { UserDocsContext } from "../Logic/UserDocsLogic";
+import { enqueueSnackbar } from "notistack";
 
 export default function DeleteUserDocButton({ data }: { data?: UserDocs }) {
   const [open, setOpen] = React.useState(false);
-  const setDocs = React.useContext(UserDocsContext);
+  const { value, setValue } = React.useContext(UserDocsContext);
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -23,15 +23,20 @@ export default function DeleteUserDocButton({ data }: { data?: UserDocs }) {
     setOpen(false);
   };
 
-  const handleDelete = (id: string) => {
-    setOpen(false);
-    setDocs((data) => data.filter((item) => item.id !== id));
+  const handleDelete = async () => {
+    const id = data?.id;
     try {
-      const response = fetchUserDocs.deleteUsers(id);
-      console.log(response);
+      const response = await fetchUserDocs.deleteDoc(id as string);
+      if (response.data.error_code === 0) {
+        setValue(value.filter((item) => item.id !== id));
+        enqueueSnackbar("Документ удален", { variant: "success" });
+      } else {
+        enqueueSnackbar("Не удалось удалить документ", { variant: "error" });
+      }
     } catch (error) {
-      console.log(error);
+      enqueueSnackbar("Не удалось удалить документ", { variant: "error" });
     }
+    handleClose();
   };
 
   return (
@@ -56,7 +61,7 @@ export default function DeleteUserDocButton({ data }: { data?: UserDocs }) {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Отмена</Button>
-          <Button onClick={handleClose} autoFocus>
+          <Button onClick={handleDelete} autoFocus>
             Подтвердить
           </Button>
         </DialogActions>

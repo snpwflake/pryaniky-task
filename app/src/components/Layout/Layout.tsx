@@ -4,6 +4,7 @@ import IconButton from "@mui/material/IconButton";
 import { useState } from "react";
 import MenuOpenSharpIcon from "@mui/icons-material/MenuOpenSharp";
 import { Link } from "react-router-dom";
+import { SnackbarProvider } from "notistack";
 const Container = styled.div({
   display: "flex",
   backgroundColor: "white",
@@ -93,10 +94,6 @@ const LINKS = [
     title: "Документы",
     path: "/userdocs",
   },
-  {
-    title: "Выйти",
-    path: "",
-  },
 ];
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
@@ -106,29 +103,38 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     setAsideOpen((prev) => !prev);
   };
 
+  const onExit = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  };
   const OpenIcon = asideOpen ? MenuOpenSharpIcon : MenuIcon;
   return (
-    <Container>
-      <Aside open={asideOpen}>
-        <Header>Logo</Header>
-        <MenuLinks>
-          {LINKS.map((link) => (
-            <StyledLink key={link.path}>
-              <Link to={link.path}>{link.title}</Link>
+    <SnackbarProvider maxSnack={3}>
+      <Container>
+        <Aside open={asideOpen}>
+          <Header>Logo</Header>
+          <MenuLinks>
+            {LINKS.map((link) => (
+              <StyledLink key={link.path}>
+                <Link to={link.path}>{link.title}</Link>
+              </StyledLink>
+            ))}
+            <StyledLink>
+              <a onClick={onExit}>Выйти</a>
             </StyledLink>
-          ))}
-        </MenuLinks>
-      </Aside>
-      <ContainerDiv>
-        <Header>
-          <IconButton onClick={toggleAside}>
-            <OpenIcon />
-          </IconButton>
-        </Header>
-        <Main>{children}</Main>
-        <Footer>Автор: Timur </Footer>
-      </ContainerDiv>
-    </Container>
+          </MenuLinks>
+        </Aside>
+        <ContainerDiv>
+          <Header>
+            <IconButton onClick={toggleAside}>
+              <OpenIcon />
+            </IconButton>
+          </Header>
+          <Main>{children}</Main>
+          <Footer>Автор: Timur </Footer>
+        </ContainerDiv>
+      </Container>
+    </SnackbarProvider>
   );
 };
 

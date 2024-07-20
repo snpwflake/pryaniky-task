@@ -4,7 +4,7 @@ import AuthProvider from "../../services/AuthProvider";
 import styled from "@emotion/styled";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 const Form = styled.form({
   display: "flex",
   flexDirection: "column",
@@ -52,8 +52,10 @@ const AuthForm = () => {
       if (response.data.error_code === 0) {
         const token = response.data.data.token;
         localStorage.setItem("token", token);
-        redirect("/profile");
         setIsSuccess(true);
+        setTimeout(() => {
+          window.location.href = "/userdocs";
+        }, 500);
       } else {
         setError("Неверный логин или пароль");
       }

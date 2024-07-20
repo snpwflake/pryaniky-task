@@ -1,19 +1,20 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useMemo, useState } from "react";
 import BasicTable from "../UI/Table";
 import fetchUserDocs from "../../services/UserDocs";
 import { ISO, UserDocs } from "../../models/userDocs";
 import useAuthToken from "../../hooks/useAuth";
 import { Column } from "../../models/table";
-import ButtonChange from "../UI/ChangeButton";
+import ChangeButton from "../UI/ChangeButton";
+import AddDocButton from "../UI/DialogAddDoc";
+import LoadingContainer from "./LoadingContainer";
 
 const columns: Column[] = [
   {
     id: "options",
-    label: "",
-    minWidth: 32,
-    align: "center",
-    format: (_: any, row: UserDocs) => {
-      return <ButtonChange data={row} />;
+    label: "Опции",
+    minWidth: 170,
+    format: (value: string, row: UserDocs) => {
+      return <ChangeButton data={row} />;
     },
   },
   { id: "id", label: "Номер документа", minWidth: 170 },
@@ -57,18 +58,37 @@ const columns: Column[] = [
   { id: "employeeNumber", label: "Номер сотрудника", minWidth: 170 },
 ];
 
-const UserDocsContext = createContext({});
 const UserDocsLogic = () => {
-  const { token, status } = useAuthToken();
-  const [data, setData] = useState<UserDocs[]>([]);
+  return (
+    <DocsProvider>
+      <AddDocButton />
+      <BasicTable columns={columns} />
+    </DocsProvider>
+  );
+};
+
+export default UserDocsLogic;
+
+function DocsProvider({ children }: any) {
+  const { status } = useAuthToken();
+  const [state, setState] = useState<UserDocs[]>([]);
   const [error, setError] = useState<string>("");
+
+  const [loading, setLoading] = useState(true);
+
+  const provided = useMemo(
+    () => ({ value: state, setValue: setState, error, loading }),
+    [state, error, loading]
+  );
+
   const fetchData = async () => {
     setError("");
+    setLoading(true);
     try {
       const response = await fetchUserDocs.getUsers();
       const data = response.data;
       if (data.error_code === 0) {
-        setData(data.data);
+        setState(data.data);
       } else {
         setError(data.error_message);
       }
@@ -76,6 +96,8 @@ const UserDocsLogic = () => {
       console.log(error);
       setError("Ошибка при получении данных");
     }
+
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -83,12 +105,15 @@ const UserDocsLogic = () => {
   }, [status]);
 
   return (
-    <UserDocsContext.Provider value={setData}>
-      <BasicTable data={data} columns={columns} />
+    <UserDocsContext.Provider value={provided}>
+      {children}
     </UserDocsContext.Provider>
   );
-};
+}
 
-export default UserDocsLogic;
-
-export { UserDocsContext };
+export const UserDocsContext = createContext<{
+  value: UserDocs[];
+  setValue: React.Dispatch<React.SetStateAction<UserDocs[]>>;
+  error: string;
+  loading: boolean;
+}>({ value: [], setValue: () => {}, error: "", loading: false });

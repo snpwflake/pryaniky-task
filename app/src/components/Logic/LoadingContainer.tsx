@@ -1,23 +1,20 @@
 import styled from "@emotion/styled";
 import CircularProgress from "@mui/material/CircularProgress";
-const Loading = styled.div({
-  position: "fixed",
-  zIndex: 10000,
+
+const Container = styled.div({
   display: "flex",
-  top: 0,
-  left: 0,
   justifyContent: "center",
   alignItems: "center",
-  height: "100vh",
+  height: "300px",
   width: "100%",
-  backgroundColor: "white",
 });
-const LoadingSession = ({ loading }: { loading: boolean }) => {
+const LoadingContainer = ({ loading }: { loading: boolean }) => {
   if (!loading) return null;
   return (
-    <Loading>
+    <Container>
       <CircularProgress />
-    </Loading>
+    </Container>
   );
 };
-export default LoadingSession;
+
+export default LoadingContainer;
